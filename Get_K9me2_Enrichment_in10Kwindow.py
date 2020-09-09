@@ -79,7 +79,8 @@ def get_IP_Input_sum(prefix):
     return IP_sum,Input_sum
 
 
-def get_fisher(chr,prefix,IP_sum,Input_sum):
+def get_fisher(chr,prefix):
+    IP_sum,Input_sum = get_IP_Input_sum(prefix)
     coverage_file = "%s/%s/%s.coverage" % (Result_dir, prefix, chr)
     get_coverage(chr,prefix)
     fisher_txt = "%s/%s/%s.result"%(Result_dir,prefix,chr)
@@ -105,7 +106,7 @@ def main():
         chr_line=get_line()
         pool=Pool()
         for chr in chr_line:
-            pool.apply_async(get_coverage, (chr, sample))
+            pool.apply_async(get_fisher, (chr, sample))
         pool.close()
         pool.join()
 
