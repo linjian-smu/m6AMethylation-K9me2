@@ -8,6 +8,9 @@ from scipy import stats
 import pandas as pd
 from rpy2.robjects.packages import importr
 from rpy2.robjects.vectors import FloatVector
+import rpy2.robjects as robjects
+R_stats=importr('stats')
+
 
 Bam_dir ='' 
 chrom_size=''
@@ -89,9 +92,10 @@ def get_fisher(chr,prefix):
             a =f.readlines()
         for i in a:
             j = i.rstrip().split()
-            stat,p = stats.fisher_exact([[int(j[3]),int(j[4])],[IP_sum,Input_sum]])
+            list_ = [int(j[3]),int(j[4]),IP_sum,Input_sum]
+            p = R_stats.fisher_test(robjects.r['matrix'](FloatVector(list_), nrow= 2)).rx('p.value')[0][0]
             if int(j[3]) != 0 and IP_sum != 0 and Input_sum != 0:
-                FC=str((float(j[3])/IP_sum)/(float(j[4])/Input_sum))
+                FC=str(((float(j[3])+1)/IP_sum)/((float(j[4])+1)/Input_sum))
             else:
                 FC="NA"
             fw.write("%s\t%d\t%d\t%s\t%f\n"%(i.rstrip(),IP_sum,Input_sum,FC,p))
